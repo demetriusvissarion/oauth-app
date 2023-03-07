@@ -1,14 +1,15 @@
 /*
  * Package Imports
  */
-const app = require("express");
-const passport = require("passport");
-const GitHubStrategy = require("passport-github2").Strategy;
 
 const path = require("path");
 require("dotenv").config();
 const express = require("express");
 const partials = require("express-partials");
+
+const session = require("express-session");
+const passport = require("passport");
+const GitHubStrategy = require("passport-github2").Strategy;
 
 const app = express();
 
@@ -111,9 +112,10 @@ app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 /*
  * ensureAuthenticated Callback Function
  */
-const ensureAuthenticated = (req, res, next) => {
+
+function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
   res.redirect("/login");
-};
+}
