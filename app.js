@@ -32,7 +32,7 @@ passport.use(
       callbackURL: "http://localhost:3000/auth/github/callback",
     },
     (accessToken, refreshToken, profile, done) => {
-      return done(null, profile);
+      done(null, profile);
     }
   )
 );
@@ -49,23 +49,22 @@ passport.deserializeUser((user, done) => {
  *  Express Project Setup
  */
 
-app.use(passport.initialize());
-
-app.use(passport.session());
+app.set("views", path.join(__dirname, "/views"));
+app.set("view engine", "ejs");
+app.use(partials());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "/public")));
 
 app.use(
   session({
     secret: "codecademy",
     resave: false,
-    saveUnitialized: false,
+    saveUninitialized: false,
   })
 );
 
-app.set("views", __dirname + "/views");
-app.set("view engine", "ejs");
-app.use(partials());
-app.use(express.json());
-app.use(express.static(__dirname + "/public"));
+app.use(passport.initialize());
+app.use(passport.session());
 
 /*
  * Routes
@@ -97,7 +96,7 @@ app.get(
 
 app.get(
   "/auth/github/callback",
-  passport.authenticate("scope", {
+  passport.authenticate("github", {
     failureRedirect: "/login",
     successRedirect: "/",
   })
@@ -107,7 +106,7 @@ app.get(
  * Listener
  */
 
-app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+app.listen(PORT, () => console.log(`Listening on http://localhost:${PORT}`));
 
 /*
  * ensureAuthenticated Callback Function
@@ -116,6 +115,5 @@ app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
-  }
-  res.redirect("/login");
+  } else res.redirect("/login");
 }
